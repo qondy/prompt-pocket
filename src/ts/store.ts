@@ -2,9 +2,11 @@ import {
   collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc, increment, writeBatch,
 } from 'firebase/firestore';
 import { db } from './firebase';
-import { Prompt, PromptData } from './types';
+import { Folder, Prompt, PromptData } from './types';
 
 export const MAX_TITLE = 80;
+export const MAX_FOLDER_NAME = 30;
+export const MAX_FOLDERS = 50;
 export const MAX_BODY = 8000;
 export const MAX_TAGS = 10;
 export const MAX_TAG_LEN = 20;
@@ -30,6 +32,7 @@ function sanitize(data: PromptData): PromptData {
     body: data.body.slice(0, MAX_BODY),
     tags: parseTags(data.tags),
     pinned: data.pinned === true,
+    folderId: data.folderId.slice(0, 40),
   };
 }
 
@@ -52,6 +55,7 @@ export function subscribePrompts(
         body: str(data.body, MAX_BODY),
         tags: parseTags(Array.isArray(data.tags) ? data.tags : []),
         pinned: data.pinned === true,
+        folderId: str(data.folderId, 40),
         copyCount: typeof data.copyCount === 'number' && data.copyCount > 0 ? Math.floor(data.copyCount) : 0,
         lastCopiedAt: msOrNull(data.lastCopiedAt),
         createdAt,
@@ -97,4 +101,50 @@ export async function createPrompts(uid: string, items: PromptData[]): Promise<v
     });
   });
   await batch.commit();
+}
+
+// ============================================================
+// Folders
+// ============================================================
+const foldersCol = (uid: string) => collection(db, 'users', uid, 'folders');
+
+export function subscribeFolders(
+  uid: string,
+  onData: (list: Folder[]) => void,
+  onError: (err: Error) => void,
+): () => void {
+  return onSnapshot(foldersCol(uid), (snap) => {
+    const list: Folder[] = [];
+    snap.forEach((d) => {
+      const data = d.data();
+      const createdAt = msOrNull(data.createdAt);
+      const name = str(data.name, MAX_FOLDER_NAME).trim();
+      if (!createdAt || !name) return;
+      list.push({ id: d.id, name, createdAt });
+    });
+    list.sort((a, b) => a.createdAt - b.createdAt);
+    onData(list);
+  }, onError);
+}
+
+export async function createFolder(uid: string, name: string): Promise<string> {
+  const ref = await addDoc(foldersCol(uid), { name: name.trim().slice(0, MAX_FOLDER_NAME), createdAt: Date.now() });
+  return ref.id;
+}
+
+export function renameFolder(uid: string, id: string, name: string): Promise<void> {
+  return updateDoc(doc(db, 'users', uid, 'folders', id), { name: name.trim().slice(0, MAX_FOLDER_NAME) });
+}
+
+/** フォルダを削除し、中のプロンプトは未分類に戻す（プロンプト自体は消さない） */
+export async function deleteFolder(uid: string, id: string, promptIds: string[]): Promise<void> {
+  // writeBatch は1回500件までなので分割する
+  for (let i = 0; i < promptIds.length; i += 400) {
+    const batch = writeBatch(db);
+    promptIds.slice(i, i + 400).forEach((pid) => {
+      batch.update(doc(db, 'users', uid, 'prompts', pid), { folderId: '' });
+    });
+    await batch.commit();
+  }
+  await deleteDoc(doc(db, 'users', uid, 'folders', id));
 }

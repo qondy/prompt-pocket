@@ -246,7 +246,22 @@
       <div class="feature-card">
         <div class="feature-icon"><svg width="30" height="30" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><rect x="22" y="22" width="30" height="32" rx="5"/><path d="M42 22 V15 C42 12 40 10 37 10 H17 C14 10 12 12 12 15 V39 C12 42 14 44 17 44 H22"/></svg></div>
         <h3 class="feature-title">ワンタップでコピー</h3>
-        <p class="feature-desc">一覧の「コピー」を押すだけでクリップボードへ。あとはAIの入力欄に貼り付けるだけです。</p>
+        <p class="feature-desc">一覧のカードをタップするだけでクリップボードへ。あとはAIの入力欄に貼り付けるだけです。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><svg width="30" height="30" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 18 C8 15 10 13 13 13 H25 L30 19 H51 C54 19 56 21 56 24 V46 C56 49 54 51 51 51 H13 C10 51 8 49 8 46 Z"/></svg></div>
+        <h3 class="feature-title">フォルダで分けて管理</h3>
+        <p class="feature-desc">「仕事のメール」「開発」のようにフォルダを作って整理できます。上部のフォルダをタップで切り替え。フォルダを消しても、中のプロンプトは「未分類」に残ります。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><svg width="30" height="30" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M26 34 V14 C26 11 28 9 31 9 C34 9 36 11 36 14 V30"/><path d="M36 28 C36 25 38 24 40 24 C42 24 44 25 44 28 V32"/><path d="M44 30 C44 28 46 27 48 27 C50 27 52 28 52 31 V40 C52 48 46 55 38 55 H34 C29 55 26 53 23 49 L14 37 C12 35 13 32 15 31 C17 30 19 31 21 33 L26 38"/></svg></div>
+        <h3 class="feature-title">カードをタップですぐコピー</h3>
+        <p class="feature-desc">ボタンを狙わなくても、カードのどこをタップしてもコピーできます。PCなら検索して <code>Enter</code> で先頭の1件をそのままコピー。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><svg width="30" height="30" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16 H54"/><path d="M22 32 H54"/><path d="M22 48 H54"/><path d="M10 16 H12"/><path d="M10 32 H12"/><path d="M10 48 H12"/></svg></div>
+        <h3 class="feature-title">リスト表示</h3>
+        <p class="feature-desc">表示を「リスト」に切り替えると、1行に1件のコンパクトな一覧に。たくさん登録していても、目当てのプロンプトをすばやく見つけてコピーできます。</p>
       </div>
       <div class="feature-card">
         <div class="feature-icon"><svg width="30" height="30" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12 C16 12 16 18 16 24 C16 30 12 32 10 32 C12 32 16 34 16 40 C16 46 16 52 22 52"/><path d="M42 12 C48 12 48 18 48 24 C48 30 52 32 54 32 C52 32 48 34 48 40 C48 46 48 52 42 52"/><path d="M26 32 H38"/></svg></div>
@@ -279,18 +294,22 @@
     </div>
     <div class="step">
       <span class="step-num">2</span>
-      <p><strong>プロンプトを登録</strong>：「新しいプロンプト」からタイトルと本文を入力。まずは「サンプルを4つ入れてみる」で雰囲気をつかむのもおすすめです。</p>
+      <p><strong>フォルダを作る（任意）</strong>：上部の「フォルダ」から、用途ごとのフォルダを作れます。開いているフォルダで新規作成すると、そのフォルダに入ります。</p>
     </div>
     <div class="step">
       <span class="step-num">3</span>
-      <p><strong>変える部分は変数に</strong>：毎回入れ替える部分は <code>{{対象}}</code> のように二重の波かっこで囲みます。「変数を挿入」ボタンでも入れられます。</p>
+      <p><strong>プロンプトを登録</strong>：「新しいプロンプト」からタイトルと本文を入力。まずは「サンプルを4つ入れてみる」で雰囲気をつかむのもおすすめです。</p>
     </div>
     <div class="step">
       <span class="step-num">4</span>
-      <p><strong>使いたいときにコピー</strong>：一覧から探して「コピー」。変数があるときは中身を入力して「コピーする」を押します。</p>
+      <p><strong>変える部分は変数に</strong>：毎回入れ替える部分は <code>{{対象}}</code> のように二重の波かっこで囲みます。「変数を挿入」ボタンでも入れられます。</p>
     </div>
     <div class="step">
       <span class="step-num">5</span>
+      <p><strong>使いたいときにコピー</strong>：一覧から探してカードをタップ。変数があるときは中身を入力して「コピーする」を押します。</p>
+    </div>
+    <div class="step">
+      <span class="step-num">6</span>
       <p><strong>AIに貼り付けて送信</strong>：ChatGPT や Claude などの入力欄に貼り付けるだけ。よく使うものほど自然と上に並んでいきます。</p>
     </div>
   </section>

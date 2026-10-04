@@ -3,6 +3,8 @@ export interface PromptData {
   body: string;
   tags: string[];
   pinned: boolean;
+  /** 所属フォルダのID（'' は未分類） */
+  folderId: string;
 }
 
 export interface Prompt extends PromptData {
@@ -14,3 +16,11 @@ export interface Prompt extends PromptData {
 }
 
 export type SortKey = 'popular' | 'recent' | 'new' | 'title';
+
+export interface Folder {
+  id: string;
+  name: string;
+  createdAt: number;
+}
+
+export type ViewMode = 'card' | 'list';
