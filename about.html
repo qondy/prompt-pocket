@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>プロンプトポケット — 機能紹介</title>
+<meta name="description" content="AIへの指示（プロンプト）をポケットにしまっておき、使いたいときにワンタップでコピー。{{変数}}の穴埋め、タグ・検索、よく使う順の並び替えで、お気に入りのプロンプトにすぐたどり着けます。">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta property="og:title" content="プロンプトポケット — 機能紹介">
+<meta property="og:image" content="https://prompt-pocket.vercel.app/ogp.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --c1: #27ae60;
+    --c2: #1e8449;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+    background: #1a1a1a;
+    color: #ececec;
+    line-height: 1.7;
+  }
+  a { color: inherit; text-decoration: none; }
+  .topbar {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 24px 20px 0;
+  }
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    color: #9a9a9a;
+    transition: color .15s ease;
+  }
+  .back-link:hover { color: #fff; }
+
+  .hero {
+    position: relative;
+    overflow: hidden;
+    background: var(--c1);
+    margin: 24px 20px 0;
+    border-radius: 24px;
+    padding: 64px 24px;
+    text-align: center;
+  }
+  .hero::before, .hero::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    background: #ffffff;
+    opacity: 0.07;
+    filter: blur(10px);
+  }
+  .hero::before { width: 240px; height: 240px; top: -80px; left: -60px; }
+  .hero::after { width: 300px; height: 300px; bottom: -120px; right: -80px; }
+  .badge {
+    position: relative;
+    width: 128px;
+    height: 128px;
+    margin: 0 auto 24px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.94);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--c1);
+    box-shadow: 0 0 0 14px rgba(255,255,255,0.14);
+  }
+  .category-pill {
+    position: relative;
+    display: inline-block;
+    background: rgba(255,255,255,0.18);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 16px;
+    border-radius: 999px;
+    margin-bottom: 16px;
+  }
+  .hero h1 {
+    position: relative;
+    margin: 0 0 12px;
+    font-size: clamp(28px, 5vw, 40px);
+    font-weight: 800;
+    color: #fff;
+  }
+  .hero p.tagline {
+    position: relative;
+    margin: 0 auto 32px;
+    max-width: 520px;
+    font-size: 17px;
+    color: rgba(255,255,255,0.88);
+  }
+  .cta {
+    position: relative;
+    display: inline-block;
+    background: #fff;
+    color: #1a1a1a;
+    font-weight: 700;
+    font-size: 16px;
+    padding: 14px 36px;
+    border-radius: 999px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    transition: transform .15s ease;
+  }
+  .cta:hover { transform: translateY(-2px); }
+
+  .features {
+    max-width: 880px;
+    margin: 56px auto 0;
+    padding: 0 20px;
+  }
+  .features h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0 0 24px;
+    color: #fff;
+  }
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+  }
+  .feature-card {
+    background: #18281e;
+    border: 1px solid #224030;
+    border-radius: 16px;
+    padding: 24px;
+  }
+  .feature-icon {
+    color: var(--c1);
+    font-size: 28px;
+    margin-bottom: 12px;
+  }
+  .feature-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 0 8px;
+    color: #fff;
+  }
+  .feature-desc {
+    font-size: 14px;
+    color: #b2cbbc;
+    margin: 0;
+  }
+
+  .steps {
+    max-width: 880px;
+    margin: 40px auto 0;
+    padding: 0 20px;
+  }
+  .steps h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0 0 20px;
+    color: #fff;
+  }
+  .step {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 14px 0;
+    border-top: 1px solid #1f3a29;
+  }
+  .step:first-of-type { border-top: 0; }
+  .step-num {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--c1);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .step p { margin: 0; font-size: 14px; color: #d0e2d6; }
+  .step strong { color: #fff; }
+  code {
+    background: rgba(255,255,255,0.1);
+    color: #ffe7a3;
+    border-radius: 4px;
+    padding: 0 4px;
+    font-size: 0.95em;
+  }
+
+  .note {
+    max-width: 880px;
+    margin: 24px auto 0;
+    padding: 0 20px;
+    font-size: 13px;
+    color: #8aa394;
+  }
+
+  .footer-cta {
+    max-width: 880px;
+    margin: 56px auto 0;
+    padding: 0 20px 64px;
+    text-align: center;
+  }
+  .footer-cta .cta {
+    background: var(--c1);
+    color: #fff;
+    box-shadow: none;
+  }
+  .footer-links {
+    margin-top: 20px;
+    font-size: 13px;
+    color: #8aa394;
+  }
+  .footer-links a { color: #9a9a9a; }
+  .footer-links a:hover { color: #fff; }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <a class="back-link" href="https://apps.yuji-nakamura.com/">← アプリ一覧に戻る</a>
+  </div>
+
+  <section class="hero">
+    <span class="category-pill">仕事</span>
+    <div class="badge"><svg width="72" height="72" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 26 V10 H44 V26"/><path d="M26 16 H38"/><path d="M26 21 H34"/><path d="M14 26 H50 V40 C50 49 42 54 32 54 C22 54 14 49 14 40 Z"/></svg></div>
+    <h1>プロンプトポケット</h1>
+    <p class="tagline">AIへの指示を、ポケットから。よく使うプロンプトを登録しておき、欲しいときにワンタップでコピーできるアプリです。</p>
+    <a class="cta" href="https://prompt-pocket.vercel.app">アプリを使ってみる →</a>
+  </section>
+
+  <section class="features">
+    <h2>できること</h2>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon"><svg width="30" height="30" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 26 V10 H44 V26"/><path d="M26 16 H38"/><path d="M26 21 H34"/><path d="M14 26 H50 V40 C50 49 42 54 32 54 C22 54 14 49 14 40 Z"/></svg></div>
+        <h3 class="feature-title">プロンプトをしまっておける</h3>
+        <p class="feature-desc">よく使うAIへの指示に、タイトルとタグをつけて保存。ChatGPT・Claude・Gemini など、どのAIにもそのまま使えます。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><svg width="30" height="30" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><rect x="22" y="22" width="30" height="32" rx="5"/><path d="M42 22 V15 C42 12 40 10 37 10 H17 C14 10 12 12 12 15 V39 C12 42 14 44 17 44 H22"/></svg></div>
+        <h3 class="feature-title">ワンタップでコピー</h3>
+        <p class="feature-desc">一覧の「コピー」を押すだけでクリップボードへ。あとはAIの入力欄に貼り付けるだけです。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><svg width="30" height="30" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12 C16 12 16 18 16 24 C16 30 12 32 10 32 C12 32 16 34 16 40 C16 46 16 52 22 52"/><path d="M42 12 C48 12 48 18 48 24 C48 30 52 32 54 32 C52 32 48 34 48 40 C48 46 48 52 42 52"/><path d="M26 32 H38"/></svg></div>
+        <h3 class="feature-title">{{変数}}で穴埋め</h3>
+        <p class="feature-desc">本文に <code>{{文章}}</code> のように書いておくと、コピーするときに入力欄が出て、中身を埋めた状態でコピーできます。前回の入力も覚えています。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><svg width="30" height="30" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="28" cy="28" r="16"/><path d="M40 40 L54 54"/></svg></div>
+        <h3 class="feature-title">検索とタグで絞り込み</h3>
+        <p class="feature-desc">タイトル・本文・タグをまとめて検索。タグをタップすれば、目的のプロンプトだけにすぐ絞り込めます。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><svg width="30" height="30" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M24 10 H40"/><path d="M27 10 V26 L18 36 H46 L37 26 V10"/><path d="M32 36 V54"/></svg></div>
+        <h3 class="feature-title">ピン留めとよく使う順</h3>
+        <p class="feature-desc">お気に入りはピン留めでいつも先頭に。コピーした回数を数えているので、「よく使う順」「最近コピーした順」にも並べ替えられます。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><svg width="30" height="30" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14 H54"/><path d="M10 34 H54"/><path d="M10 54 H54"/><rect x="14" y="20" width="8" height="14"/><rect x="26" y="22" width="8" height="12"/><rect x="40" y="40" width="8" height="14"/></svg></div>
+        <h3 class="feature-title">スマホとPCで同じ棚</h3>
+        <p class="feature-desc">Googleでログインすると、登録したプロンプトはあなた専用の領域に保存され、スマホでもPCでも同じものを使えます。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="steps">
+    <h2>使い方</h2>
+    <div class="step">
+      <span class="step-num">1</span>
+      <p><strong>Googleでログイン</strong>：プロンプトはあなた専用の領域に保存されます。</p>
+    </div>
+    <div class="step">
+      <span class="step-num">2</span>
+      <p><strong>プロンプトを登録</strong>：「新しいプロンプト」からタイトルと本文を入力。まずは「サンプルを4つ入れてみる」で雰囲気をつかむのもおすすめです。</p>
+    </div>
+    <div class="step">
+      <span class="step-num">3</span>
+      <p><strong>変える部分は変数に</strong>：毎回入れ替える部分は <code>{{対象}}</code> のように二重の波かっこで囲みます。「変数を挿入」ボタンでも入れられます。</p>
+    </div>
+    <div class="step">
+      <span class="step-num">4</span>
+      <p><strong>使いたいときにコピー</strong>：一覧から探して「コピー」。変数があるときは中身を入力して「コピーする」を押します。</p>
+    </div>
+    <div class="step">
+      <span class="step-num">5</span>
+      <p><strong>AIに貼り付けて送信</strong>：ChatGPT や Claude などの入力欄に貼り付けるだけ。よく使うものほど自然と上に並んでいきます。</p>
+    </div>
+  </section>
+
+  <p class="note">※ 変数の前回の入力内容は、お使いの端末のブラウザにだけ保存されます（サーバーには送られません）。パスワードや個人情報などはプロンプトに保存しないでください。</p>
+
+  <section class="footer-cta">
+    <a class="cta" href="https://prompt-pocket.vercel.app">今すぐ使ってみる →</a>
+    <p class="footer-links"><a href="https://apps.yuji-nakamura.com/">他のアプリも見る</a></p>
+  </section>
+</body>
+</html>
