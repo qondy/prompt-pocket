@@ -132,7 +132,7 @@
         <input type="text" id="input-title" maxlength="80" placeholder="例：文章をていねいに校正" autocomplete="off" />
       </div>
       <div class="field">
-        <label class="field__label" for="input-body">プロンプト本文<span class="field__req">必須</span></label>
+        <label class="field__label" for="input-body">プロンプト本文<span class="field__hint">コピーされる内容</span><span class="field__req">必須</span></label>
         <textarea id="input-body" rows="9" maxlength="8000" placeholder="例：以下の文章を校正してください。&#10;&#10;{{文章}}"></textarea>
         <p class="field__note">
           <code>{{文章}}</code> のように二重の波かっこで囲むと「変数」になり、コピーするときに中身を入力できます。
@@ -140,6 +140,10 @@
         </p>
         <p class="field__vars hidden" id="editor-vars"></p>
         <p class="field__count" id="body-count">0 / 8000</p>
+      </div>
+      <div class="field">
+        <label class="field__label" for="input-memo">メモ<span class="field__hint">コピーされない説明。使い方や注意点などに</span></label>
+        <textarea id="input-memo" rows="3" maxlength="2000" placeholder="例：新しいアプリを企画から公開まで進めるときに使う"></textarea>
       </div>
       <div class="field">
         <label class="field__label" for="input-tags">タグ<span class="field__hint">スペース・「,」・「#」区切りで最大10個</span></label>

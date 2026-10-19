@@ -24,6 +24,7 @@ const ICON_FOLDER_PATH = '<path d="M8 18 C8 15 10 13 13 13 H25 L30 19 H51 C54 19
 const ICON_FOLDER = svg(ICON_FOLDER_PATH, 15);
 const ICON_FOLDER_PLUS = svg(`${ICON_FOLDER_PATH}<path d="M32 27 V43"/><path d="M24 35 H40"/>`, 15);
 const ICON_MORE = svg('<circle cx="16" cy="32" r="2.4" fill="currentColor" stroke="none"/><circle cx="32" cy="32" r="2.4" fill="currentColor" stroke="none"/><circle cx="48" cy="32" r="2.4" fill="currentColor" stroke="none"/>', 15);
+const ICON_NOTE = svg('<path d="M14 10 H42 L50 18 V54 H14 Z"/><path d="M22 28 H42"/><path d="M22 37 H42"/><path d="M22 46 H34"/>', 14);
 const ICON_EDIT = svg('<path d="M42 12 L52 22 L24 50 H14 V40 Z"/><path d="M36 18 L46 28"/>');
 
 // ============================================================
@@ -62,6 +63,7 @@ const editorForm = $<HTMLFormElement>('editor-form');
 const editorTitle = $('editor-title');
 const inputTitle = $<HTMLInputElement>('input-title');
 const inputBody = $<HTMLTextAreaElement>('input-body');
+const inputMemo = $<HTMLTextAreaElement>('input-memo');
 const btnInsertVar = $<HTMLButtonElement>('btn-insert-var');
 const editorVars = $('editor-vars');
 const bodyCount = $('body-count');
@@ -241,7 +243,7 @@ function matches(p: Prompt): boolean {
   if (state.tag && !p.tags.includes(state.tag)) return false;
   const words = state.query.toLowerCase().split(/\s+/).filter(Boolean);
   if (!words.length) return true;
-  const hay = `${p.title}\n${p.body}\n${p.tags.join(' ')}`.toLowerCase();
+  const hay = `${p.title}\n${p.body}\n${p.memo}\n${p.tags.join(' ')}`.toLowerCase();
   return words.every((w) => hay.includes(w));
 }
 
@@ -357,11 +359,21 @@ function renderCard(p: Prompt): HTMLElement {
   head.appendChild(tools);
   li.appendChild(head);
 
-  const body = renderBody(p.body);
-  const isLong = p.body.length > 140 || p.body.split('\n').length > 4;
   const expanded = state.expanded.has(p.id);
-  if (isLong && !expanded) body.classList.add('is-clamped');
+  const memoLong = p.memo.length > 90 || p.memo.split('\n').length > 3;
+
+  const body = renderBody(p.body);
+  const bodyLong = p.body.length > 140 || p.body.split('\n').length > 4;
+  const isLong = bodyLong || memoLong;
+  if (bodyLong && !expanded) body.classList.add('is-clamped');
   li.appendChild(body);
+  if (p.memo) {
+    const memo = document.createElement('div');
+    memo.className = 'prompt-card__memo';
+    memo.appendChild(iconEl(ICON_NOTE, 'prompt-card__memo-icon'));
+    memo.appendChild(textEl('p', `prompt-card__memo-text${memoLong && !expanded ? ' is-clamped' : ''}`, p.memo));
+    li.appendChild(memo);
+  }
   if (isLong) {
     const more = button(expanded ? '閉じる' : '全文を見る', 'link-btn prompt-card__more', () => {
       if (state.expanded.has(p.id)) state.expanded.delete(p.id);
@@ -434,7 +446,12 @@ function renderRow(p: Prompt): HTMLElement {
   if (folder) sub.push(folder.name);
   if (vars.length) sub.push(`変数 ${vars.length}`);
   p.tags.slice(0, 3).forEach((t) => sub.push(`#${t}`));
-  main.appendChild(textEl('span', 'prompt-row__sub', sub.length ? sub.join(' ・ ') : p.body.replace(/\s+/g, ' ').slice(0, 60)));
+  // メモがあれば、タグより説明のほうが役に立つので優先して出す
+  const memoLine = p.memo.replace(/\s+/g, ' ').slice(0, 80);
+  const subText = memoLine
+    ? [folder ? folder.name : '', memoLine].filter(Boolean).join(' ・ ')
+    : (sub.length ? sub.join(' ・ ') : p.body.replace(/\s+/g, ' ').slice(0, 60));
+  main.appendChild(textEl('span', 'prompt-row__sub', subText));
   li.appendChild(main);
 
   const editBtn = button('', 'icon-btn prompt-row__edit', () => openEditor(p));
@@ -665,12 +682,13 @@ function editorValue(): PromptData {
     folderId: inputFolder.value,
     title: inputTitle.value.trim(),
     body: inputBody.value,
+    memo: inputMemo.value,
     tags: parseTags(inputTags.value),
     pinned: inputPinned.checked,
   };
 }
 
-const snapshotOf = (): string => JSON.stringify([inputTitle.value, inputBody.value, inputTags.value, inputPinned.checked, inputFolder.value]);
+const snapshotOf = (): string => JSON.stringify([inputTitle.value, inputBody.value, inputMemo.value, inputTags.value, inputPinned.checked, inputFolder.value]);
 
 function isEditorDirty(): boolean {
   return editorOverlay.classList.contains('is-open') && snapshotOf() !== state.editorSnapshot;
@@ -697,6 +715,7 @@ function openEditor(p: Prompt | null, preset?: PromptData): void {
   editorTitle.textContent = p ? 'プロンプトを編集' : '新しいプロンプト';
   inputTitle.value = data?.title ?? '';
   inputBody.value = data?.body ?? '';
+  inputMemo.value = data?.memo ?? '';
   inputTags.value = data ? data.tags.join(' ') : (state.tag || '');
   inputPinned.checked = data?.pinned ?? false;
   // 新規作成時は、いま開いているフォルダを初期値にする

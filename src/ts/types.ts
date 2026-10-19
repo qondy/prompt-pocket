@@ -1,6 +1,8 @@
 export interface PromptData {
   title: string;
   body: string;
+  /** コピーされない説明メモ */
+  memo: string;
   tags: string[];
   pinned: boolean;
   /** 所属フォルダのID（'' は未分類） */

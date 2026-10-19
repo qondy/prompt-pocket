@@ -8,6 +8,7 @@ export const MAX_TITLE = 80;
 export const MAX_FOLDER_NAME = 30;
 export const MAX_FOLDERS = 50;
 export const MAX_BODY = 8000;
+export const MAX_MEMO = 2000;
 export const MAX_TAGS = 10;
 export const MAX_TAG_LEN = 20;
 
@@ -30,6 +31,7 @@ function sanitize(data: PromptData): PromptData {
   return {
     title: data.title.trim().slice(0, MAX_TITLE),
     body: data.body.slice(0, MAX_BODY),
+    memo: data.memo.trim().slice(0, MAX_MEMO),
     tags: parseTags(data.tags),
     pinned: data.pinned === true,
     folderId: data.folderId.slice(0, 40),
@@ -53,6 +55,7 @@ export function subscribePrompts(
         id: d.id,
         title: str(data.title, MAX_TITLE),
         body: str(data.body, MAX_BODY),
+        memo: str(data.memo, MAX_MEMO),
         tags: parseTags(Array.isArray(data.tags) ? data.tags : []),
         pinned: data.pinned === true,
         folderId: str(data.folderId, 40),

@@ -364,7 +364,7 @@
 
   &__body {
     font-size: $font-size-sm;
-    color: $color-text-muted;
+    color: $color-text;
     line-height: 1.7;
     white-space: pre-wrap;
     word-break: break-word;
@@ -379,6 +379,36 @@
 
   &__more {
     align-self: flex-start;
+  }
+
+  // コピーされない説明メモ（本文と区別して控えめに）
+  &__memo {
+    display: flex;
+    gap: 6px;
+    padding: 8px 10px;
+    border-radius: $radius-sm;
+    background: $color-bg;
+    color: $color-text-muted;
+  }
+
+  &__memo-icon {
+    display: inline-flex;
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+
+  &__memo-text {
+    font-size: $font-size-xs;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-break: break-word;
+
+    &.is-clamped {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
   }
 
   &__meta {
