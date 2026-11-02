@@ -11,6 +11,9 @@ import {
 import { extractVars, fillVars, splitVars, loadVarValues, saveVarValues, clearVarValues } from './vars';
 import { SAMPLE_PROMPTS } from './samples';
 import { Folder, Prompt, PromptData, SortKey, ViewMode } from './types';
+import { initClickTracking } from './analytics';
+
+initClickTracking();
 
 // ============================================================
 // Icons（開発者定義の固定SVGのみ）
